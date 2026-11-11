@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+
+# OS and editor files
+.DS_Store
+.vscode/
+
+# test coverage
+coverage/
