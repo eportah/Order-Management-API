@@ -125,6 +125,17 @@ The API uses standard HTTP response codes, including:
 - `404 Not Found` — Requested order does not exist
 - `500 Internal Server Error` — Unexpected server failure
 
+## Cloud Deployment
+
+The API is deployed on Render using Docker and connects to a MongoDB Atlas database.
+
+- **API Endpoint:** https://order-management-api-apk3.onrender.com/orders
+- **Swagger Documentation:** https://order-management-api-apk3.onrender.com/api-docs
+
+The application uses environment variables to configure its MongoDB connection without exposing credentials in the source code.
+
+This deployment is intended for educational demonstration and uses synthetic test data.
+
 ## Project Scope
 
 This project focuses on fundamental backend development concepts and cloud deployment.
