@@ -1,12 +1,45 @@
+const{ timingSafeEqual } = require('node:crypto');
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
+
+// if env variable is missing, write requests are rejected automatically (failing closed)
+function requireWriteApiKey(req, res, next){
+  // req.get('x-api-key') retrieves key supplied by Postman or another client
+  const expectedKey = process.env.WRITE_API_KEY;
+  const providedKey = req.get('x-api-key');
+
+  // 401 unauthorized rejects requests without a valid key
+  if(!expectedKey || !providedKey){
+    return res.status(401).json({error: 'Valid API key required'});
+  }
+
+  const expected = Buffer.from(expectedKey);
+  const provided = Buffer.from(providedKey);
+
+  // timingSafeEqual() compares 2 values without leaking info through string-comparison timing differences
+  if(
+    expected.length !== provided.length ||
+    !timingSafeEqual(expected, provided)
+  ){
+    return res.status(401).json({error: 'Valid API key required'});
+  }
+
+  // allows authenticated request to continue to existing endpoint handler
+  next();
+}
 
 // routes for orders
 
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     writeApiKey:
+ *       type: apiKey
+ *       in: header
+ *       name: x-api-key
+ *       description: Required for creating, updating, and deleting orders.
  *   schemas:
  *     Order:
  *       type: object
@@ -38,6 +71,8 @@ const Order = require('../models/order');
  * @swagger
  * /orders:
  *   post:
+ *     security:
+ *       - writeApiKey: []
  *     summary: Create a new order
  *     description: Adds a new order document to the MongoDB database.
  *     requestBody:
@@ -79,7 +114,7 @@ const Order = require('../models/order');
  */
 
 // post, create new order
-router.post('/', async (req, res) => {
+router.post('/',requireWriteApiKey, async (req, res) => {
   try {
     const newOrder = new Order(req.body);
     const savedOrder = await newOrder.save();
@@ -173,6 +208,8 @@ router.get('/:id', async (req, res) => {
  * @swagger
  * /orders/{id}:
  *   patch:
+ *     security:
+ *       - writeApiKey: []
  *     summary: Update an order's status
  *     description: Modifies an existing order using its database ID.
  *     parameters:
@@ -211,7 +248,7 @@ router.get('/:id', async (req, res) => {
  */
 
 // patch: update order status
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireWriteApiKey, async (req, res) => {
   try {
     if (!req.body || typeof req.body.status !== 'string' || !req.body.status.trim()){
         return res.status(400).json({error: 'Valid status is required' });
@@ -242,6 +279,8 @@ router.patch('/:id', async (req, res) => {
  * @swagger
  * /orders/{id}:
  *   delete:
+ *     security:
+ *       - writeApiKey: []
  *     summary: Delete an order
  *     description: Removes an order document from the MongoDB database by its ID.
  *     parameters:
@@ -271,7 +310,7 @@ router.patch('/:id', async (req, res) => {
  */
 
 // delete an order
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireWriteApiKey, async (req, res) => {
   try {
     const deletedOrder = await Order.findByIdAndDelete(req.params.id);
     if (!deletedOrder) return res.status(404).json({ message: 'Order not found' });

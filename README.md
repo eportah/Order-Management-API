@@ -125,6 +125,26 @@ The API uses standard HTTP response codes, including:
 - `404 Not Found` — Requested order does not exist
 - `500 Internal Server Error` — Unexpected server failure
 
+## Demo Access and Security
+
+The hosted API is intended for educational demonstration using synthetic order data.
+
+The GET endpoints are publicly accessible. Creating, updating, and deleting orders require an API key supplied through the `x-api-key` HTTP header.
+
+The API key is stored as an environment variable and is not included in the repository.
+
+This is a demonstration-level access control mechanism, not a production authentication system.
+
+## Free-Tier Availability
+
+This project uses free-tier hosting through Render and MongoDB Atlas.
+
+Render may spin down the web service after 15 minutes of inactivity, causing the first request to take longer while the service restarts.
+
+MongoDB Atlas may automatically pause an inactive Free cluster after 30 days without database connections. A paused cluster must be manually resumed.
+
+Consequently, the hosted demo may occasionally be unavailable due to free-tier inactivity.
+
 ## Cloud Deployment
 
 The API is deployed on Render using Docker and connects to a MongoDB Atlas database.
