@@ -1,8 +1,6 @@
 # Order Management API
 
-A learning-focused REST API built with Node.js, Express, and MongoDB to practice backend development, CRUD operations, API documentation, containerization, and cloud deployment.
-
-This project provides a simple API for creating, retrieving, updating, and deleting sample orders. It is intended as an educational demonstration rather than a production-ready order management system.
+Learning-focused REST API built with Node.js, Express, and MongoDB to practice backend development, CRUD operations, API documentation, containerization, and cloud deployment.
 
 ## Technologies Used
 
@@ -24,6 +22,7 @@ This project provides a simple API for creating, retrieving, updating, and delet
 - Validate required fields and prevent negative order totals
 - Return appropriate HTTP status codes for successful and unsuccessful requests
 - Explore and test endpoints through Swagger UI
+- Protect write operations using API-key authentication
 
 ## API Endpoints
 
@@ -48,7 +47,7 @@ This project provides a simple API for creating, retrieving, updating, and delet
 }
 ```
 
-The API stores the order in MongoDB and returns the created document with a `201 Created` response.
+This endpoint requires a valid API key in the x-api-key HTTP header. The API stores the order in MongoDB and returns the created document with a `201 Created` response.
 
 The `status` field defaults to `Pending` if omitted.
 
@@ -65,8 +64,8 @@ The `status` field defaults to `Pending` if omitted.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/eportah/order-management-api.git
-   cd order-management-api
+   git clone https://github.com/eportah/Order-Management-API.git
+   cd Order-Management-API
    ```
 
 2. Install dependencies:
@@ -78,9 +77,10 @@ The `status` field defaults to `Pending` if omitted.
 3. Create a `.env` file in the project root and configure the MongoDB connection:
 
    ```dotenv
-   MONGO_URI=mongodb+srv://<username>:<password>@orders-api-cluster.h7hgnkl.mongodb.net/orders_api
+   MONGO_URI=<your-own-mongodb-connection-string>
+   WRITE_API_KEY=<your-own-generated-api-key>
    ```
-   Replace the placeholders with your own Atlas database credentials and cluster hostname. Ensure your IP address is permitted in Atlas Network Access. Do not commit your `.env` file.
+   Replace placeholders with your own Atlas database credentials and cluster hostname. Ensure your IP address is permitted in Atlas Network Access. Generate a random API key and assign it to WRITE_API_KEY, which is required for POST, PATCH, and DELETE requests when running your own instance of the API.
 
 4. Start the application:
 
@@ -93,7 +93,7 @@ The `status` field defaults to `Pending` if omitted.
    - API: `http://localhost:3000/orders`
    - Swagger UI: `http://localhost:3000/api-docs`
 
-The application uses port `3000` by default, or the `PORT` environment variable when provided.
+Uses port `3000` by default, or the `PORT` environment variable when provided.
 
 ## Running with Docker
 
@@ -122,46 +122,41 @@ The API uses standard HTTP response codes, including:
 - `200 OK` — Successful retrieval, update, or deletion
 - `201 Created` — Order created successfully
 - `400 Bad Request` — Invalid request data or order ID
+- `401 Unauthorized` — Missing or invalid API key for a write operation
 - `404 Not Found` — Requested order does not exist
 - `500 Internal Server Error` — Unexpected server failure
 
 ## Demo Access and Security
 
-The hosted API is intended for educational demonstration using synthetic order data.
+The hosted API is intended for demonstration using dummy data.
 
 The GET endpoints are publicly accessible. Creating, updating, and deleting orders require an API key supplied through the `x-api-key` HTTP header.
 
-The API key is stored as an environment variable and is not included in the repository.
-
-This is a demonstration-level access control mechanism, not a production authentication system.
+Demonstration-level access control, not a production authentication system.
 
 ## Free-Tier Availability
-
-This project uses free-tier hosting through Render and MongoDB Atlas.
 
 Render may spin down the web service after 15 minutes of inactivity, causing the first request to take longer while the service restarts.
 
 MongoDB Atlas may automatically pause an inactive Free cluster after 30 days without database connections. A paused cluster must be manually resumed.
 
-Consequently, the hosted demo may occasionally be unavailable due to free-tier inactivity.
+The hosted demo may occasionally be unavailable due to free-tier inactivity.
 
 ## Cloud Deployment
 
-The API is deployed on Render using Docker and connects to a MongoDB Atlas database.
+Deployed on Render using Docker and connects to a MongoDB Atlas database.
 
 - **API Endpoint:** https://order-management-api-apk3.onrender.com/orders
 - **Swagger Documentation:** https://order-management-api-apk3.onrender.com/api-docs
 
-The application uses environment variables to configure its MongoDB connection without exposing credentials in the source code.
+Uses environment variables to configure its MongoDB connection without exposing credentials in the source code.
 
-This deployment is intended for educational demonstration and uses synthetic test data.
+This deployment uses dummy test data.
 
 ## Project Scope
 
-This project focuses on fundamental backend development concepts and cloud deployment.
-
-It does not implement user authentication, authorization, payment processing, or other features expected in a production order management system. Use synthetic test data rather than real customer information.
+Focuses on fundamental backend development concepts and cloud deployment. Uses API-key authentication to protect write operations but does not implement user accounts, role-based access control, payment processing, or other features expected in a production order management system.
 
 ## License
 
-No open-source license has been assigned to this project.
+MIT license
